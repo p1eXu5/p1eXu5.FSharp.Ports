@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Authors>p1eXu5</Authors>
+    <Description>Port and TaskPort computation expressions.</Description>
+    <Copyright>2023 Vladimir Likhatskiy</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <RepositoryUrl></RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>fsharp;f#;monad;port</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Ports.PortsBuilder.fs" />
+    <Compile Include="Ports.TaskPortBuilder.fs" />
+  </ItemGroup>
+
+</Project>
