@@ -87,9 +87,24 @@ module TaskPortBuilderCE =
                 }
             |> TaskPort
 
+        member _.ReturnFrom(expr: ValueTask<_>) =
+            fun env ->
+                task {
+                    return! expr
+                }
+            |> TaskPort
+
         member _.Bind(m: TaskPort<'config,'a>, f: 'a -> TaskPort<'config, 'b>) = TaskPort.bind f m
 
         member _.Bind(m: TaskPort<'config,'a>, f: 'a -> Task<'b>) =
+            TaskPort (fun env ->
+                task {
+                    let! x = TaskPort.run env m
+                    return! f x
+                }
+            )
+
+        member _.Bind(m: TaskPort<'config,'a>, f: 'a -> ValueTask<'b>) =
             TaskPort (fun env ->
                 task {
                     let! x = TaskPort.run env m
@@ -122,6 +137,14 @@ module TaskPortBuilderCE =
                 }
             )
 
+        member _.Bind(m: Port<'config,'a>, f: 'a -> ValueTask<'b>) =
+            TaskPort (fun env ->
+                task {
+                    let x = Port.run env m
+                    return! f x
+                }
+            )
+
         member _.Bind(m: Task<'a>, f: 'a -> TaskPort<'config,'b>) =
             TaskPort (fun env ->
                 task {
@@ -129,7 +152,24 @@ module TaskPortBuilderCE =
                     return! TaskPort.run env (f x)
                 }
             )
+
+        member _.Bind(m: ValueTask<'a>, f: 'a -> TaskPort<'config,'b>) =
+            TaskPort (fun env ->
+                task {
+                    let! x = m
+                    return! TaskPort.run env (f x)
+                }
+            )
+
         member _.Bind(m: Task, f: unit -> TaskPort<'config,'a>) =
+            TaskPort (fun env ->
+                task {
+                    do! m
+                    return! TaskPort.run env (f ())
+                }
+            )
+
+        member _.Bind(m: ValueTask, f: unit -> TaskPort<'config,'a>) =
             TaskPort (fun env ->
                 task {
                     do! m
@@ -145,7 +185,23 @@ module TaskPortBuilderCE =
                 }
             )
 
+        member _.Bind(m: ValueTask, f: unit -> Task<'a>) =
+            TaskPort (fun _ ->
+                task {
+                    do! m
+                    return! f ()
+                }
+            )
+
         member _.Bind(m: Task<'a>, f: 'a -> Task<'b>) =
+            TaskPort (fun _ ->
+                task {
+                    let! x = m
+                    return! f x
+                }
+            )
+
+         member _.Bind(m: ValueTask<'a>, f: 'a -> Task<'b>) =
             TaskPort (fun _ ->
                 task {
                     let! x = m

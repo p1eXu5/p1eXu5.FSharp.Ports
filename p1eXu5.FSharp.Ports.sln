@@ -5,7 +5,13 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F8F0D8FE-5B77-469E-B02C-45D21837C9D4}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "p1eXu5.FSharp.Ports", "src\p1eXu5.FSharp.Ports\p1eXu5.FSharp.Ports.fsproj", "{61F722B8-426E-48DE-8D48-B7BB024905E5}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "p1eXu5.FSharp.Ports", "src\p1eXu5.FSharp.Ports\p1eXu5.FSharp.Ports.fsproj", "{61F722B8-426E-48DE-8D48-B7BB024905E5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F0A811F6-F4F2-4BF9-9506-3FBAD480F0A7}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "p1eXu5.FSharp.Ports.Tests", "test\p1eXu5.FSharp.Ports.Tests\p1eXu5.FSharp.Ports.Tests.fsproj", "{71F19787-E2A7-451D-9103-C41CDCFF3654}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "p1eXu5.FSharp.Ports.Tests.Tasks", "test\p1eXu5.FSharp.Ports.Tests.Tasks\p1eXu5.FSharp.Ports.Tests.Tasks.csproj", "{32948C48-1123-4DBB-B740-B9B63B0DFBAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,11 +23,24 @@ Global
 		{61F722B8-426E-48DE-8D48-B7BB024905E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61F722B8-426E-48DE-8D48-B7BB024905E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61F722B8-426E-48DE-8D48-B7BB024905E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71F19787-E2A7-451D-9103-C41CDCFF3654}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71F19787-E2A7-451D-9103-C41CDCFF3654}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71F19787-E2A7-451D-9103-C41CDCFF3654}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71F19787-E2A7-451D-9103-C41CDCFF3654}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32948C48-1123-4DBB-B740-B9B63B0DFBAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32948C48-1123-4DBB-B740-B9B63B0DFBAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32948C48-1123-4DBB-B740-B9B63B0DFBAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32948C48-1123-4DBB-B740-B9B63B0DFBAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{61F722B8-426E-48DE-8D48-B7BB024905E5} = {F8F0D8FE-5B77-469E-B02C-45D21837C9D4}
+		{71F19787-E2A7-451D-9103-C41CDCFF3654} = {F0A811F6-F4F2-4BF9-9506-3FBAD480F0A7}
+		{32948C48-1123-4DBB-B740-B9B63B0DFBAF} = {F0A811F6-F4F2-4BF9-9506-3FBAD480F0A7}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3DD658CB-0F3A-4DBE-B8BB-71353098257E}
 	EndGlobalSection
 EndGlobal
