@@ -54,9 +54,6 @@ module TaskPort =
         TaskPort action
 
 
-    let using (f: 'a -> TaskPort<_,_>) (v: #IDisposable) =
-        tryFinally (fun () -> v.Dispose()) (f v)
-
     let tee (f: 'a -> unit) (m: TaskPort<_,_>) =
         fun env ->
             task {
@@ -83,16 +80,30 @@ module TaskPortBuilderCE =
             |> TaskPort
 
         member _.ReturnFrom(expr: Task<_>) =
-            fun env ->
+            fun _ ->
                 task {
                     return! expr
                 }
             |> TaskPort
 
+        member _.ReturnFrom(expr: Task) =
+            fun _ ->
+                task {
+                    do! expr
+                }
+            |> TaskPort
+
         member _.ReturnFrom(expr: ValueTask<_>) =
-            fun env ->
+            fun _ ->
                 task {
                     return! expr
+                }
+            |> TaskPort
+
+        member _.ReturnFrom(expr: ValueTask) =
+            fun _ ->
+                task {
+                    do! expr
                 }
             |> TaskPort
 
@@ -187,7 +198,29 @@ module TaskPortBuilderCE =
                 }
             )
 
+         member _.Bind(m: Task<'a>, f: 'a -> Task<'b>) =
+            task {
+                let! a = m
+                return! f a
+            }
+
         member _.Bind(m: ValueTask, f: unit -> Task<'a>) =
+            TaskPort (fun _ ->
+                task {
+                    do! m
+                    return! f ()
+                }
+            )
+
+        member _.Bind(m: Task, f: unit -> ValueTask<'a>) =
+            TaskPort (fun _ ->
+                task {
+                    do! m
+                    return! f ()
+                }
+            )
+
+        member _.Bind(m: ValueTask, f: unit -> ValueTask<'a>) =
             TaskPort (fun _ ->
                 task {
                     do! m
@@ -219,6 +252,7 @@ module TaskPortBuilderCE =
         member this.Combine(expr1: TaskPort<_,_>, expr2: 'a -> TaskPort<_,_>) =
             this.Bind(expr1, expr2)
 
+
         member _.Delay(func) = func
         member _.Run(delay) =
             TaskPort (fun env ->
@@ -228,7 +262,6 @@ module TaskPortBuilderCE =
                 }
             )
 
-        member _.Using(v, f) = TaskPort.using f v
 
         member this.TryWith(delayed: unit -> TaskPort<_,_>, handler: exn -> TaskPort<_,_>) =
             try
@@ -236,6 +269,38 @@ module TaskPortBuilderCE =
             with
                 e ->
                     handler e
+
+        member this.TryFinally(delayed: unit -> TaskPort<_,_>, compensation) =
+            TaskPort (fun env ->
+                task {
+                    try
+                        return! TaskPort.run env (delayed())
+                    finally compensation()
+                }
+            )
+
+
+        member this.Using(disposable:'a, body: 'a -> TaskPort<'b,'c>) =
+            match box disposable with
+            | :? IAsyncDisposable as disp ->
+                TaskPort (fun env ->
+                    task {
+                        use! d = task { return disp }
+                        return! TaskPort.run env (body disposable)
+                    }
+                )
+
+            | :? IDisposable as disp ->
+                let body' =
+                    fun () -> body disposable
+
+                this.TryFinally(body', fun () -> disp.Dispose ())
+
+            | _ ->
+                let body' =
+                    fun () -> body disposable
+
+                this.TryFinally(body', fun () -> ())
 
 
     let taskPort = TaskPortBuilder()

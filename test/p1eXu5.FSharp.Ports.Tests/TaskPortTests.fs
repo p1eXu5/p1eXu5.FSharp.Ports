@@ -90,3 +90,29 @@ module TaskPortTests =
 
         let res = tp |> TaskPort.runSynchronously ()
         res |> should equal 6
+
+
+    [<Test>]
+    let ``use cs disposable task test`` () =
+        let tp =
+            taskPort {
+                use! d = TestTaskFactory.CreateSyncDisposableAsync()
+                do! (d :> ISyncDisposable).DoTaskAsync()
+                return d
+            }
+
+        let res = tp |> TaskPort.runSynchronously ()
+        (res :?> SyncDisposable).IsDisposed |> should be True
+
+
+    [<Test>]
+    let ``use cs async disposable task test`` () =
+        let tp =
+            taskPort {
+                use! d = TestTaskFactory.CreateAsynchronousDisposableAsync()
+                do! (d :> IAsynchronousDisposable).DoTaskAsync()
+                return d
+            }
+
+        let res = tp |> TaskPort.runSynchronously ()
+        (res :?> AsynchronousDisposable).IsDisposed |> should be True

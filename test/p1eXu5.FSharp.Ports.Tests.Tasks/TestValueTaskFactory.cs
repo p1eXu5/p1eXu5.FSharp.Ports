@@ -12,4 +12,9 @@ public static class TestValueTaskFactory
     {
         throw new NotImplementedException();
     }
+
+    public static ValueTask DoValueTask()
+    {
+        return ValueTask.CompletedTask;
+    }
 }
