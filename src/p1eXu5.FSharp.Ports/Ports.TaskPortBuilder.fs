@@ -68,6 +68,8 @@ module TaskPort =
         |> TaskPort
 
 
+open System
+
 module TaskPortBuilderCE =
 
     type TaskPortBuilder () =
@@ -227,6 +229,13 @@ module TaskPortBuilderCE =
             )
 
         member _.Using(v, f) = TaskPort.using f v
+
+        member this.TryWith(delayed: unit -> TaskPort<_,_>, handler: exn -> TaskPort<_,_>) =
+            try
+                this.ReturnFrom(delayed())
+            with
+                e ->
+                    handler e
 
 
     let taskPort = TaskPortBuilder()

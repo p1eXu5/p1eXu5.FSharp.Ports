@@ -1,5 +1,6 @@
 namespace p1eXu5.FSharp.Ports.Tests
 
+open System
 open System.Threading.Tasks
 
 open NUnit.Framework
@@ -59,3 +60,33 @@ module TaskPortTests =
 
         let res = tp |> TaskPort.runSynchronously ()
         res |> should equal 5
+
+    [<Test>]
+    let ``try with discarding cs exception task test`` () =
+        let tp =
+            taskPort {
+                try
+                    let! _ = TestTaskFactory.SimpleTaskWithException(5)
+                    return 5
+                with
+                    ex ->
+                        return 6
+            }
+
+        let res = tp |> TaskPort.runSynchronously ()
+        res |> should equal 6
+
+    [<Test>]
+    let ``try with discarding cs value task test`` () =
+        let tp =
+            taskPort {
+                try
+                    let! _ = TestValueTaskFactory.SimpleValueTaskWithException(5)
+                    return 5
+                with
+                    ex ->
+                        return 6
+            }
+
+        let res = tp |> TaskPort.runSynchronously ()
+        res |> should equal 6
