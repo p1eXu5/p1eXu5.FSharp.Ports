@@ -11,7 +11,7 @@
     <Description>Port and TaskPort computation expressions.</Description>
     <Copyright>2023 Vladimir Likhatskiy</Copyright>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <RepositoryUrl></RepositoryUrl>
+    <RepositoryUrl>https://github.com/p1eXu5/p1eXu5.FSharp.Ports</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>fsharp;f#;monad;port;taskPort</PackageTags>
   </PropertyGroup>
