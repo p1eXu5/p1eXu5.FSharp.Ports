@@ -4,9 +4,9 @@
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     
-    <Version>1.0.1-preview</Version>
+    <Version>1.0.2-preview</Version>
     <AssemblyVersion>1.0</AssemblyVersion>
-    <FileVersion>1.0.1.0</FileVersion>
+    <FileVersion>1.0.2.0</FileVersion>
     <Authors>p1eXu5</Authors>
     <Description>Port and TaskPort computation expressions.</Description>
     <Copyright>2023 Vladimir Likhatskiy</Copyright>
@@ -19,6 +19,10 @@
   <ItemGroup>
     <Compile Include="Ports.PortsBuilder.fs" />
     <Compile Include="Ports.TaskPortBuilder.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="7.0.300" />
   </ItemGroup>
 
 </Project>
