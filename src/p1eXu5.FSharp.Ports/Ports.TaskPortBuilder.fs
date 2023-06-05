@@ -8,9 +8,6 @@ type TaskPort<'config, 'a> = TaskPort of action: ('config -> Task<'a>)
 
 module TaskPort =
 
-    open System
-
-
     /// Run a Interpreter with a given environment
     let run env (TaskPort action)  =
         action env  // simply call the inner function
@@ -64,74 +61,110 @@ module TaskPort =
             }
         |> TaskPort
 
+    let apply (mf: TaskPort<'cfg, ('a -> 'b)>) (m: TaskPort<'cfg, 'a>) =
+        fun env ->
+            task {
+                let! a = run env m
+                let! f = run env mf
+                return f a
+            }
+        |> TaskPort
+
+    // ===============
+    // Port
+    // ===============
+
+    let fromPort (expr: Port<_,_>) =
+        fun env -> task { return Port.run env expr }
+        |> TaskPort
+
+    let fromPortF (f: 'a -> Port<_,_>) =
+        fun _ -> task { return f }
+        |> TaskPort
+
+    let applyPort (m: TaskPort<'cfg, 'a>) (mf: TaskPort<'cfg, ('a -> Port<'cfg, 'b>)>) =
+        fun env ->
+            task {
+                let! a = run env m
+                let! f = run env mf
+                let p = f a
+                return Port.run env p
+            }
+        |> TaskPort
+
+    // ===============
+    // Task
+    // ===============
+
+    let fromTaskT (t: Task<_>) =
+        fun _ -> task { return! t }
+        |> TaskPort
+
+    let fromTask (t: Task) =
+        fun _ -> task { do! t }
+        |> TaskPort
+
+    let fromTaskF (f: 'a -> Task<'b>) =
+        fun _ -> task { return f }
+        |> TaskPort
+
+    let applyTask (m: TaskPort<'cfg, 'a>) (mf: TaskPort<'cfg, ('a -> Task<'b>)>) =
+        fun env ->
+            task {
+                let! a = run env m
+                let! f = run env mf 
+                return! f a
+            }
+        |> TaskPort
+
+    // ===============
+    // ValueTask
+    // ===============
+
+    let fromValueTaskT (t: ValueTask<_>) =
+        fun _ -> task { return! t }
+        |> TaskPort
+
+    let fromValueTask (t: ValueTask) =
+        fun _ -> task { do! t }
+        |> TaskPort
+
+    let fromValueTaskF (f: 'a -> ValueTask<'b>) =
+        fun _ -> task { return f }
+        |> TaskPort
+
+    let applyValueTask (m: TaskPort<'cfg, 'a>) (mf: TaskPort<'cfg, ('a -> ValueTask<'b>)>) =
+        fun env ->
+            task {
+                let! a = run env m
+                let! f = run env mf 
+                return! f a
+            }
+        |> TaskPort
+
 
 open System
 
 module TaskPortBuilderCE =
 
     type TaskPortBuilder () =
+        member _.Zero() = TaskPort.retn ()
+
         member _.Return(v) = TaskPort.retn v
+        
         member _.ReturnFrom(expr: TaskPort<_,_>) = expr
-        member _.ReturnFrom(expr: Port<_,_>) =
-            fun env ->
-                task {
-                    return Port.run env expr
-                }
-            |> TaskPort
+        member _.ReturnFrom(expr: Port<_,_>) = TaskPort.fromPort expr
+        member _.ReturnFrom(expr: Task) = TaskPort.fromTask expr
+        member _.ReturnFrom(expr: Task<_>) = TaskPort.fromTaskT expr
+        member _.ReturnFrom(expr: ValueTask) = TaskPort.fromValueTask expr
+        member _.ReturnFrom(expr: ValueTask<_>) = TaskPort.fromValueTaskT expr
 
-        member _.ReturnFrom(expr: Task<_>) =
-            fun _ ->
-                task {
-                    return! expr
-                }
-            |> TaskPort
-
-        member _.ReturnFrom(expr: Task) =
-            fun _ ->
-                task {
-                    do! expr
-                }
-            |> TaskPort
-
-        member _.ReturnFrom(expr: ValueTask<_>) =
-            fun _ ->
-                task {
-                    return! expr
-                }
-            |> TaskPort
-
-        member _.ReturnFrom(expr: ValueTask) =
-            fun _ ->
-                task {
-                    do! expr
-                }
-            |> TaskPort
-
-        member _.Bind(m: TaskPort<'config,'a>, f: 'a -> TaskPort<'config, 'b>) = TaskPort.bind f m
-
-        member _.Bind(m: TaskPort<'config,'a>, f: 'a -> Task<'b>) =
-            TaskPort (fun env ->
-                task {
-                    let! x = TaskPort.run env m
-                    return! f x
-                }
-            )
-
-        member _.Bind(m: TaskPort<'config,'a>, f: 'a -> ValueTask<'b>) =
-            TaskPort (fun env ->
-                task {
-                    let! x = TaskPort.run env m
-                    return! f x
-                }
-            )
-
-        member _.Bind(m: Port<'config,'a>, f: 'a -> TaskPort<'config,'b>) =
-            TaskPort (fun env ->
-                task {
-                    let x = Port.run env m
-                    return! TaskPort.run env (f x)
-                }
-            )
+        member    _.Bind(m: TaskPort<'config,'a>, f:   'a -> TaskPort<'config, 'b>) = TaskPort.bind f m
+        member this.Bind(m: Port<'config,'a>,     f:   'a -> TaskPort<'config,'b>) = this.Bind(m |> TaskPort.fromPort, f)
+        member this.Bind(m: Task<'a>,             f:   'a -> TaskPort<'config,'b>) = this.Bind(m |> TaskPort.fromTaskT, f)
+        member this.Bind(m: ValueTask<'a>,        f:   'a -> TaskPort<'config,'b>) = this.Bind(m |> TaskPort.fromValueTaskT, f)
+        member this.Bind(m: Task,                 f: unit -> TaskPort<'config,'a>) = this.Bind(m |> TaskPort.fromTask, f)
+        member this.Bind(m: ValueTask,            f: unit -> TaskPort<'config,'a>) = this.Bind(m |> TaskPort.fromValueTask, f)
 
         member _.BindN(m1: Port<'config,'a1>, m2: Port<'config,'a2>, f: 'a1 * 'a2 -> TaskPort<'config,'b>) =
             TaskPort (fun env ->
@@ -142,116 +175,8 @@ module TaskPortBuilderCE =
                 }
             )
 
-        member _.Bind(m: Port<'config,'a>, f: 'a -> Task<'b>) =
-            TaskPort (fun env ->
-                task {
-                    let x = Port.run env m
-                    return! f x
-                }
-            )
-
-        member _.Bind(m: Port<'config,'a>, f: 'a -> ValueTask<'b>) =
-            TaskPort (fun env ->
-                task {
-                    let x = Port.run env m
-                    return! f x
-                }
-            )
-
-        member _.Bind(m: Task<'a>, f: 'a -> TaskPort<'config,'b>) =
-            TaskPort (fun env ->
-                task {
-                    let! x = m
-                    return! TaskPort.run env (f x)
-                }
-            )
-
-        member _.Bind(m: ValueTask<'a>, f: 'a -> TaskPort<'config,'b>) =
-            TaskPort (fun env ->
-                task {
-                    let! x = m
-                    return! TaskPort.run env (f x)
-                }
-            )
-
-        member _.Bind(m: Task, f: unit -> TaskPort<'config,'a>) =
-            TaskPort (fun env ->
-                task {
-                    do! m
-                    return! TaskPort.run env (f ())
-                }
-            )
-
-        member _.Bind(m: ValueTask, f: unit -> TaskPort<'config,'a>) =
-            TaskPort (fun env ->
-                task {
-                    do! m
-                    return! TaskPort.run env (f ())
-                }
-            )
-
-        member _.Bind(m: Task, f: unit -> Task<'a>) =
-            TaskPort (fun _ ->
-                task {
-                    do! m
-                    return! f ()
-                }
-            )
-
-         member _.Bind(m: Task<'a>, f: 'a -> Task<'b>) =
-            task {
-                let! a = m
-                return! f a
-            }
-
-        member _.Bind(m: ValueTask, f: unit -> Task<'a>) =
-            TaskPort (fun _ ->
-                task {
-                    do! m
-                    return! f ()
-                }
-            )
-
-        member _.Bind(m: Task, f: unit -> ValueTask<'a>) =
-            TaskPort (fun _ ->
-                task {
-                    do! m
-                    return! f ()
-                }
-            )
-
-        member _.Bind(m: ValueTask, f: unit -> ValueTask<'a>) =
-            TaskPort (fun _ ->
-                task {
-                    do! m
-                    return! f ()
-                }
-            )
-
-        member _.Bind(m: Task<'a>, f: 'a -> Task<'b>) =
-            TaskPort (fun _ ->
-                task {
-                    let! x = m
-                    return! f x
-                }
-            )
-
-         member _.Bind(m: ValueTask<'a>, f: 'a -> Task<'b>) =
-            TaskPort (fun _ ->
-                task {
-                    let! x = m
-                    return! f x
-                }
-            )
-
-        member _.Zero() = TaskPort.retn ()
-
-        member this.Combine(expr1: TaskPort<_,_>, expr2: TaskPort<_,_>) =
-            this.Bind(expr1, (fun () -> expr2))
-
-        member this.Combine(expr1: TaskPort<_,_>, expr2: 'a -> TaskPort<_,_>) =
-            this.Bind(expr1, expr2)
-
+        member this.Combine(expr1: TaskPort<_,_>, expr2: TaskPort<_,_>)       = this.Bind(expr1, (fun () -> expr2))
+        member this.Combine(expr1: TaskPort<_,_>, expr2: 'a -> TaskPort<_,_>) = this.Bind(expr1, expr2)
 
         member _.Delay(func) = func
         member _.Run(delay) =
@@ -262,7 +187,6 @@ module TaskPortBuilderCE =
                 }
             )
 
-
         member this.TryWith(delayed: unit -> TaskPort<_,_>, handler: exn -> TaskPort<_,_>) =
             try
                 this.ReturnFrom(delayed())
@@ -270,7 +194,7 @@ module TaskPortBuilderCE =
                 e ->
                     handler e
 
-        member this.TryFinally(delayed: unit -> TaskPort<_,_>, compensation) =
+        member _.TryFinally(delayed: unit -> TaskPort<_,_>, compensation) =
             TaskPort (fun env ->
                 task {
                     try
