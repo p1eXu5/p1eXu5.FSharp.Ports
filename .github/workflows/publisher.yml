@@ -1,0 +1,53 @@
+name: Publisher
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+    
+jobs:
+  # Set the job key. The key is displayed as the job name
+  # when a job name is not provided
+  publish:
+    environment: PUBLISH_KEYS
+    env:
+        key1: ${{ secrets.PUBLISH_TO_NUGET_ORG }}
+      
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Checks out a copy of your repository on the ubuntu-latest machine
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '7.0.x'
+        
+    - name: Install dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+      
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal
+#    - name: Publish
+#      uses: brandedoutcast/publish-nuget@v2.5.2
+#      with:
+#          PROJECT_FILE_PATH: MintPlayer.SeasonChecker/MintPlayer.SeasonChecker.csproj
+#          NUGET_KEY: ${{secrets.PUBLISH_TO_NUGET_ORG}}
+#          INCLUDE_SYMBOLS: true
+    - name: Pack
+      run: dotnet pack --no-build --configuration Release src/p1eXu5.FSharp.Ports/p1eXu5.FSharp.Ports.fsproj --output .
+      
+    - name: PushNuget
+      
+      run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{env.key1}} --skip-duplicate
+      
+ #   - name: AddGithubSource
+ #     run: dotnet nuget add source --username PieterjanDeClippel --password ${{secrets.PUBLISH_TO_GITHUB_COM}} --name github https://nuget.pkg.github.com/MintPlayer/index.json
+ #   - name: PushGithub
+ #     run: dotnet nuget push *.nupkg --source github --skip-duplicate
