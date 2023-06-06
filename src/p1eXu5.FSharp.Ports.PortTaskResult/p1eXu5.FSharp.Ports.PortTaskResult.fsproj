@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;net6.0;net7.0</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Ports.PortTaskResultBuilder.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\p1eXu5.FSharp.Ports\p1eXu5.FSharp.Ports.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="7.0.300" />
+  </ItemGroup>
+
+</Project>

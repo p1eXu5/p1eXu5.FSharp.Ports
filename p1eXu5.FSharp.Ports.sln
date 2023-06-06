@@ -9,9 +9,9 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "p1eXu5.FSharp.Ports", "src\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F0A811F6-F4F2-4BF9-9506-3FBAD480F0A7}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "p1eXu5.FSharp.Ports.Tests", "test\p1eXu5.FSharp.Ports.Tests\p1eXu5.FSharp.Ports.Tests.fsproj", "{71F19787-E2A7-451D-9103-C41CDCFF3654}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "p1eXu5.FSharp.Ports.Tests", "test\p1eXu5.FSharp.Ports.Tests\p1eXu5.FSharp.Ports.Tests.fsproj", "{71F19787-E2A7-451D-9103-C41CDCFF3654}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "p1eXu5.FSharp.Ports.Tests.Tasks", "test\p1eXu5.FSharp.Ports.Tests.Tasks\p1eXu5.FSharp.Ports.Tests.Tasks.csproj", "{32948C48-1123-4DBB-B740-B9B63B0DFBAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "p1eXu5.FSharp.Ports.Tests.Tasks", "test\p1eXu5.FSharp.Ports.Tests.Tasks\p1eXu5.FSharp.Ports.Tests.Tasks.csproj", "{32948C48-1123-4DBB-B740-B9B63B0DFBAF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0312FFF8-536D-4E77-9F06-0342D1841BF5}"
 	ProjectSection(SolutionItems) = preProject
@@ -19,6 +19,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		pack.fsx = pack.fsx
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "p1eXu5.FSharp.Ports.PortTaskResult", "src\p1eXu5.FSharp.Ports.PortTaskResult\p1eXu5.FSharp.Ports.PortTaskResult.fsproj", "{BF8ED0FE-039C-4C71-BD36-1CA4BB4AE084}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "p1eXu5.FSharp.Ports.PortTaskResult.Tests", "test\p1eXu5.FSharp.Ports.PortTaskResult.Tests\p1eXu5.FSharp.Ports.PortTaskResult.Tests.fsproj", "{31CEB446-E3EE-4312-A61D-B03612393653}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +42,14 @@ Global
 		{32948C48-1123-4DBB-B740-B9B63B0DFBAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32948C48-1123-4DBB-B740-B9B63B0DFBAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32948C48-1123-4DBB-B740-B9B63B0DFBAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF8ED0FE-039C-4C71-BD36-1CA4BB4AE084}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF8ED0FE-039C-4C71-BD36-1CA4BB4AE084}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF8ED0FE-039C-4C71-BD36-1CA4BB4AE084}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF8ED0FE-039C-4C71-BD36-1CA4BB4AE084}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31CEB446-E3EE-4312-A61D-B03612393653}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31CEB446-E3EE-4312-A61D-B03612393653}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31CEB446-E3EE-4312-A61D-B03612393653}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31CEB446-E3EE-4312-A61D-B03612393653}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +58,8 @@ Global
 		{61F722B8-426E-48DE-8D48-B7BB024905E5} = {F8F0D8FE-5B77-469E-B02C-45D21837C9D4}
 		{71F19787-E2A7-451D-9103-C41CDCFF3654} = {F0A811F6-F4F2-4BF9-9506-3FBAD480F0A7}
 		{32948C48-1123-4DBB-B740-B9B63B0DFBAF} = {F0A811F6-F4F2-4BF9-9506-3FBAD480F0A7}
+		{BF8ED0FE-039C-4C71-BD36-1CA4BB4AE084} = {F8F0D8FE-5B77-469E-B02C-45D21837C9D4}
+		{31CEB446-E3EE-4312-A61D-B03612393653} = {F0A811F6-F4F2-4BF9-9506-3FBAD480F0A7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3DD658CB-0F3A-4DBE-B8BB-71353098257E}
