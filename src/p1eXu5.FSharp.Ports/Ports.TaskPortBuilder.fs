@@ -20,11 +20,11 @@ module TaskPort =
         |> Async.RunSynchronously
 
     /// Create a Interpreter which returns the environment itself
-    let ask = Port (fun env -> env) 
+    let ask = Port (fun env -> env)
 
-    /// Map a function over a Reader
-    let map f reader =
-        TaskPort (fun env -> f (run env reader))
+    /// Map a function over a TaskPort
+    let map f taskPort =
+        TaskPort (fun env -> f (run env taskPort))
 
     /// flatMap a function over a Reader
     let bind f m =
@@ -226,5 +226,16 @@ module TaskPortBuilderCE =
 
                 this.TryFinally(body', fun () -> ())
 
+        member this.While(predicate, delayed: unit -> TaskPort<'conf, unit>) =
+            if predicate () then
+                this.Zero()
+            else
+                this.Bind( delayed (), fun () ->
+                    this.While(predicate, delayed))
+
+        member this.For(sequence:seq<_>, body) =
+           this.Using(sequence.GetEnumerator(),fun enum ->
+                this.While(enum.MoveNext,
+                    this.Delay(fun () -> body enum.Current)))
 
     let taskPort = TaskPortBuilder()

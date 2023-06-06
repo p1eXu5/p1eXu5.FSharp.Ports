@@ -116,3 +116,17 @@ module TaskPortTests =
 
         let res = tp |> TaskPort.runSynchronously ()
         (res :?> AsynchronousDisposable).IsDisposed |> should be True
+
+
+    [<Test>]
+    let ``for cs task test`` () =
+        let tp =
+            taskPort {
+                for _ in 1..3 do
+                    do! TestTaskFactory.DoTaskAsync()
+
+                return true
+            }
+
+        let res = tp |> TaskPort.runSynchronously ()
+        res |> should be True
