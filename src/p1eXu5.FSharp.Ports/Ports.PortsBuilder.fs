@@ -1,7 +1,7 @@
 ﻿namespace p1eXu5.FSharp.Ports
 
 
-type Port<'config, 'a> = Port of action: ('config -> 'a)
+type Port<'env, 'a> = Port of action: ('env -> 'a)
 
 
 module Port =
@@ -33,7 +33,7 @@ module Port =
         expr1 |> bind (fun () -> expr2)
 
     /// The delay operator.
-    let delay<'config, 'a> (func: unit -> Port<'config, 'a>) = func
+    let delay<'env, 'a> (func: unit -> Port<'env, 'a>) = func
 
     let retn v = (fun _ -> v) |> Port
 

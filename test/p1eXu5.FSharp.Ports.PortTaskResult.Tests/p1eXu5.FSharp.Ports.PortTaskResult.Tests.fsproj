@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="ShouldExtensions.fs" />
     <Compile Include="PortTaskResultTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

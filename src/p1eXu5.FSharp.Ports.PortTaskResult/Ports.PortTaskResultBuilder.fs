@@ -41,6 +41,10 @@ module PortTaskResult =
         fun env -> taskResult { return Port.run env expr }
         |> Port
 
+    let fromPortTask (expr: PortTask<_,_>) : PortTaskResult<_,_,_> =
+        fun env -> taskResult { return! PortTask.run env expr }
+        |> Port
+
     let fromPortF (f: 'a -> Port<_,_>) : PortTaskResult<_,_,_> =
         fun _ -> taskResult { return f }
         |> Port
@@ -66,6 +70,32 @@ module PortTaskResult =
             }
         )
 
+    let fromTask (expr: Task) : PortTaskResult<_,_,_> =
+        Port (fun _ ->
+            task {
+                let! v = expr
+                return Ok v
+            }
+        )
+
+    let fromValueTaskResult (expr: ValueTask<Result<_,_>>) : PortTaskResult<_,_,_> =
+        Port (fun _ -> taskResult { return! expr })
+
+    let fromValueTaskT (valueTask: ValueTask<_>) : PortTaskResult<_,_,_> =
+        Port (fun _ ->
+            task {
+                let! v = valueTask
+                return Ok v
+            }
+        )
+
+    let fromValueTask (expr: ValueTask) : PortTaskResult<_,_,_> =
+        Port (fun _ ->
+            task {
+                let! v = expr
+                return Ok v
+            }
+        )
 
 open System
 
@@ -77,17 +107,18 @@ module PortTaskResultBuilderCE =
         member _.Return(v) = PortTaskResult.retn v
         
         member _.ReturnFrom(expr: PortTaskResult<_,_,_>) = expr
-        //member _.ReturnFrom(expr: Task) = TaskResultPort.fromTask expr
-        //member _.ReturnFrom(expr: Task<_>) = TaskResultPort.fromTaskT expr
-        //member _.ReturnFrom(expr: ValueTask) = TaskResultPort.fromValueTask expr
-        //member _.ReturnFrom(expr: ValueTask<_>) = TaskResultPort.fromValueTaskT expr
+        member _.ReturnFrom(expr: Task<Result<'a,'err>>) = PortTaskResult.fromTaskResult expr
+        member _.ReturnFrom(expr: ValueTask<Result<'a,'err>>) = PortTaskResult.fromValueTaskResult expr
+        // member _.ReturnFrom(expr: Task) = PortTaskResult.fromTask expr
+        // member _.ReturnFrom(expr: ValueTask) = PortTaskResult.fromValueTask expr
 
         member    _.Bind(m: PortTaskResult<'env,'a,'err>, f: 'a -> PortTaskResult<'env,'b,'err>) = PortTaskResult.bind f m
-        member this.Bind(m: Task<Result<'a,'err>>,          f: 'a -> PortTaskResult<'env,'b,'err>) = this.Bind(m |> PortTaskResult.fromTaskResult, f)
-        member this.Bind(m: Port<'env,'a>,                f: 'a -> PortTaskResult<'env,'b,'err>) = this.Bind(m |> PortTaskResult.fromPort, f)
-        //member this.Bind(m: ValueTask<'a>,        f:   'a -> TaskPort<'env,'b>) = this.Bind(m |> TaskPort.fromValueTaskT, f)
-        //member this.Bind(m: Task,                 f: unit -> TaskPort<'env,'a>) = this.Bind(m |> TaskPort.fromTask, f)
-        //member this.Bind(m: ValueTask,            f: unit -> TaskPort<'env,'a>) = this.Bind(m |> TaskPort.fromValueTask, f)
+        // member this.Bind(m: PortTask<'env,'a>,            f: 'a -> PortTaskResult<'env,'b,_>) = this.Bind(m |> PortTaskResult.fromPortTask, f)
+        // member this.Bind(m: Port<'env,'a>,                f: 'a -> PortTaskResult<'env,'b,'err>) = this.Bind(m |> PortTaskResult.fromPort, f)
+        member this.Bind(m: Task<Result<'a,'err>>,        f: 'a -> PortTaskResult<'env,'b,'err>) = this.Bind(m |> PortTaskResult.fromTaskResult, f)
+        member this.Bind(m: ValueTask<Result<'a,'err>>,   f: 'a -> PortTaskResult<'env,'b,'err>) = this.Bind(m |> PortTaskResult.fromValueTaskResult, f)
+        // member this.Bind(m: Task,                         f: unit -> PortTaskResult<'env,'b,'err>) = this.Bind(m |> PortTaskResult.fromTask, f)
+        // member this.Bind(m: ValueTask,                    f: unit -> PortTaskResult<'env,'b,'err>) = this.Bind(m |> PortTaskResult.fromValueTask, f)
 
         member this.Combine(expr1: PortTaskResult<_,_,_>, expr2: PortTaskResult<_,_,_>)       = this.Bind(expr1, (fun () -> expr2))
         member this.Combine(expr1: PortTaskResult<_,_,_>, expr2: 'a -> PortTaskResult<_,_,_>) = this.Bind(expr1, expr2)

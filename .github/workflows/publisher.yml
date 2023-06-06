@@ -41,11 +41,14 @@ jobs:
 #          NUGET_KEY: ${{secrets.PUBLISH_TO_NUGET_ORG}}
 #          INCLUDE_SYMBOLS: true
     - name: Pack
-      run: dotnet pack --no-build --configuration Release src/p1eXu5.FSharp.Ports/p1eXu5.FSharp.Ports.fsproj --output .
+      run: |
+          dotnet pack --no-build --configuration Release src/p1eXu5.FSharp.Ports/p1eXu5.FSharp.Ports.fsproj --output .
+          dotnet pack --no-build --configuration Release src/p1eXu5.FSharp.Ports.PortTaskResult/p1eXu5.FSharp.Ports.PortTaskResult.fsproj --output .
       
     - name: PushNuget
-      
-      run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{env.key1}} --skip-duplicate
+      run: |
+          dotnet nuget push p1eXu5.FSharp.Ports.*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{env.key1}} --skip-duplicate
+          dotnet nuget push p1eXu5.FSharp.Ports.PortTaskResult.*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{env.key1}} --skip-duplicate
       
  #   - name: AddGithubSource
  #     run: dotnet nuget add source --username PieterjanDeClippel --password ${{secrets.PUBLISH_TO_GITHUB_COM}} --name github https://nuget.pkg.github.com/MintPlayer/index.json
