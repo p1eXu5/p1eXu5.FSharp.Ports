@@ -15,6 +15,16 @@ open p1eXu5.FSharp.Ports.PortTaskResult
 open p1eXu5.FSharp.Ports.PortTaskResultBuilderCE
 
 module PortTaskResultTests =
+    [<Test>]
+    let ``ask return test``() =
+        let sut =
+            portTaskResult {
+                let! env = PortTaskResult.ask
+                return env
+            }
+
+        let res = sut |> PortTaskResult.runSynchronously 3
+        res |> Result.shouldEqual 3
 
     [<Test>]
     let ``Bind with succeeded taskResult test``() =

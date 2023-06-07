@@ -20,7 +20,7 @@ module PortTask =
     let retn v : PortTask<_,_> = (fun _ -> task { return v }) |> Port
 
     /// Create a TaskPort which returns the environment itself
-    let ask = Port (fun env -> env)
+    let ask : PortTask<_,_> = Port (fun env -> task { return env })
 
     /// Map a function over a TaskPort
     let map f taskPort : PortTask<_,_> =
@@ -155,7 +155,6 @@ module PortTaskBuilderCE =
         member _.ReturnFrom(expr: ValueTask<_>) = PortTask.fromValueTaskT expr
 
         member    _.Bind(m: PortTask<'env,'a>, f:   'a -> PortTask<'env, 'b>) = PortTask.bind f m
-        member this.Bind(m: Port<'env,'a>,     f:   'a -> PortTask<'env,'b>) = this.Bind(m |> PortTask.fromPort, f)
         member this.Bind(m: Task<'a>,             f:   'a -> PortTask<'env,'b>) = this.Bind(m |> PortTask.fromTaskT, f)
         member this.Bind(m: ValueTask<'a>,        f:   'a -> PortTask<'env,'b>) = this.Bind(m |> PortTask.fromValueTaskT, f)
         member this.Bind(m: Task,                 f: unit -> PortTask<'env,'a>) = this.Bind(m |> PortTask.fromTask, f)

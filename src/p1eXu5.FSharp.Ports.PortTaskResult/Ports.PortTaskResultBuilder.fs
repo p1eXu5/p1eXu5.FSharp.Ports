@@ -7,12 +7,14 @@ open p1eXu5.FSharp.Ports.PortTaskBuilderCE
 type PortTaskResult<'env, 'Ok, 'Error> = Port<'env, Task<Result<'Ok, 'Error>>>
 
 module PortTaskResult =
-
     let run env (m: PortTaskResult<_,_,_>) = PortTask.run env m
 
     let runSynchronously env (m: PortTaskResult<_,_,_>) = PortTask.runSynchronously env m
 
     let retn v : PortTaskResult<_,_,_> = (fun _ -> taskResult { return v }) |> Port
+
+    /// Create a TaskPort which returns the environment itself
+    let ask : PortTaskResult<_,_,_> = Port (fun env -> taskResult { return env })
 
     let map f taskResultPort : PortTaskResult<'env, 'Ok, 'Error> =
         Port (fun env -> taskResult { return! TaskResult.map f (PortTask.run env taskResultPort) })
@@ -42,7 +44,11 @@ module PortTaskResult =
         |> Port
 
     let fromPortTask (expr: PortTask<_,_>) : PortTaskResult<_,_,_> =
-        fun env -> taskResult { return! PortTask.run env expr }
+        fun env ->
+            task {
+                let! res = PortTask.run env expr
+                return res |> Ok
+            }
         |> Port
 
     let fromPortF (f: 'a -> Port<_,_>) : PortTaskResult<_,_,_> =
@@ -58,6 +64,9 @@ module PortTaskResult =
                 return Port.run env p
             }
         |> Port
+
+    let fromResult (res: Result<_,_>) : PortTaskResult<_,_,_> =
+        Port (fun _ -> taskResult { return! res })
 
     let fromTaskResult (expr: Task<Result<_,_>>) : PortTaskResult<_,_,_> =
         Port (fun _ -> taskResult { return! expr })
@@ -107,8 +116,9 @@ module PortTaskResultBuilderCE =
         member _.Return(v) = PortTaskResult.retn v
         
         member _.ReturnFrom(expr: PortTaskResult<_,_,_>) = expr
-        member _.ReturnFrom(expr: Task<Result<'a,'err>>) = PortTaskResult.fromTaskResult expr
-        member _.ReturnFrom(expr: ValueTask<Result<'a,'err>>) = PortTaskResult.fromValueTaskResult expr
+        member _.ReturnFrom(expr: Result<_,_>) = expr |> PortTaskResult.fromResult
+        member _.ReturnFrom(expr: Task<Result<'a,'err>>) = expr |> PortTaskResult.fromTaskResult
+        member _.ReturnFrom(expr: ValueTask<Result<'a,'err>>) = expr |> PortTaskResult.fromValueTaskResult
         // member _.ReturnFrom(expr: Task) = PortTaskResult.fromTask expr
         // member _.ReturnFrom(expr: ValueTask) = PortTaskResult.fromValueTask expr
 

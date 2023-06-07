@@ -52,7 +52,7 @@ do xakeScript {
         "pack-ports" => recipe {
             do! alwaysRerun ()
 
-            let packageMask = "p1eXu5.FSharp.Ports*.nupkg"
+            let packageMask = "p1eXu5.FSharp.Ports.1*.nupkg"
             let! nextVersion = nextVersion packageMask
 
             let! _ = shell {
@@ -60,6 +60,30 @@ do xakeScript {
                 workdir "./"
                 args [
                     "src/p1eXu5.FSharp.Ports/p1eXu5.FSharp.Ports.fsproj"
+                    "-c Debug"
+                    $"-p:PackageVersion={nextVersion}"
+                    "--force"
+                    "-o ../_nugets"
+                    "--version-suffix test"
+                ]
+                failonerror
+            }
+            return ()
+        }
+
+        "pack-ports-result" => recipe {
+            do! alwaysRerun ()
+
+            do! need ["pack-ports"]
+
+            let packageMask = "p1eXu5.FSharp.Ports.PortTaskResult.1*.nupkg"
+            let! nextVersion = nextVersion packageMask
+
+            let! _ = shell {
+                cmd "dotnet pack"
+                workdir "./"
+                args [
+                    "src/p1eXu5.FSharp.Ports.PortTaskResult/p1eXu5.FSharp.Ports.PortTaskResult.fsproj"
                     "-c Debug"
                     $"-p:PackageVersion={nextVersion}"
                     "--force"

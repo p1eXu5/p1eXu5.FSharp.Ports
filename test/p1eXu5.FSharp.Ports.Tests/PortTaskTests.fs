@@ -14,6 +14,17 @@ open p1eXu5.FSharp.Ports.Tests.Tasks
 module PortTaskTests =
 
     [<Test>]
+    let ``ask return test``() =
+        let sut =
+            portTask {
+                let! env = PortTask.ask
+                return env
+            }
+
+        let res = sut |> PortTask.runSynchronously 3
+        res |> should equal 3
+
+    [<Test>]
     let ``return from task test`` () =
         let task = task { return 5 }
         let tp = portTask { return! task }

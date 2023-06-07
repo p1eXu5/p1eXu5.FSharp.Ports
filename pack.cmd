@@ -19,7 +19,7 @@ IF        "%id%"=="list" (
     GOTO :PROGRAM
 
 ) ELSE IF "%id%"=="pack" (
-    dotnet fsi .\pack.fsx "pack-ports"
+    dotnet fsi .\pack.fsx "pack-ports-result"
     GOTO :PROGRAM
 
 ) ELSE IF "%id%"=="e" (
