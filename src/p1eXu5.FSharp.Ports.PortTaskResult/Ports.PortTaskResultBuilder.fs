@@ -127,6 +127,7 @@ module PortTaskResultBuilderCE =
         // member this.Bind(m: Port<'env,'a>,                f: 'a -> PortTaskResult<'env,'b,'err>) = this.Bind(m |> PortTaskResult.fromPort, f)
         member this.Bind(m: Task<Result<'a,'err>>,        f: 'a -> PortTaskResult<'env,'b,'err>) = this.Bind(m |> PortTaskResult.fromTaskResult, f)
         member this.Bind(m: ValueTask<Result<'a,'err>>,   f: 'a -> PortTaskResult<'env,'b,'err>) = this.Bind(m |> PortTaskResult.fromValueTaskResult, f)
+        member this.Bind(m: Result<'a,'err>,        f: 'a -> PortTaskResult<'env,'b,'err>) = this.Bind(m |> PortTaskResult.fromResult, f)
         // member this.Bind(m: Task,                         f: unit -> PortTaskResult<'env,'b,'err>) = this.Bind(m |> PortTaskResult.fromTask, f)
         // member this.Bind(m: ValueTask,                    f: unit -> PortTaskResult<'env,'b,'err>) = this.Bind(m |> PortTaskResult.fromValueTask, f)
 
