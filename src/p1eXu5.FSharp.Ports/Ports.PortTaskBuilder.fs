@@ -9,10 +9,10 @@ type PortTask<'env, 'a> = Port<'env, Task<'a>>
 module PortTask =
 
     /// Run a TaskPort with a given environment
-    let run env (m: PortTask<_,_>) = Port.run env m
+    let run env (portTask: PortTask<_,_>) = Port.run env portTask
 
-    let runSynchronously env (taskPort: PortTask<'env, 'a>)  =
-        let (Port action) = taskPort
+    let runSynchronously env (portTask: PortTask<'env, 'a>)  =
+        let (Port action) = portTask
         action env
         |> Async.AwaitTask
         |> Async.RunSynchronously
@@ -23,44 +23,52 @@ module PortTask =
     let ask : PortTask<_,_> = Port (fun env -> task { return env })
 
     /// Map a function over a TaskPort
-    let map f taskPort : PortTask<_,_> =
+    let map f portTask : PortTask<_,_> =
         Port (fun env ->
             task {
-                let! a = run env taskPort
-                return! f a
+                let! a = run env portTask
+                return f a
+            }
+        )
+
+    let bindT taskf portTask : PortTask<_,_> =
+        Port (fun env ->
+            task {
+                let! a = run env portTask
+                return! taskf a
             }
         )
 
     /// flatMap a function over a TaskPort
-    let bind f m : PortTask<_,_> =
+    let bind portTaskf portTask : PortTask<_,_> =
         let newAction env =
             task {
-                let! x = run env m
-                return! run env (f x)
+                let! x = run env portTask
+                return! run env (portTaskf x)
             }
         Port newAction
 
-    let withEnv f (m: PortTask<_,_>) : PortTask<_,_> =
+    let withEnv f (portTask: PortTask<_,_>) : PortTask<_,_> =
         Port (fun env ->
             task {
-                return! run (f env) m
+                return! run (f env) portTask
             }
         )
 
-    let tee (f: 'a -> unit) (m: PortTask<_,_>) : PortTask<_,_> =
+    let tee (f: 'a -> unit) (portTask: PortTask<_,_>) : PortTask<_,_> =
         fun env ->
             task {
-                let! x = run env m
+                let! x = run env portTask
                 do
                     f x
                 return x
             }
         |> Port
 
-    let apply (mf: PortTask<'cfg, ('a -> 'b)>) (m: PortTask<'cfg, 'a>) : PortTask<_,_> =
+    let apply (mf: PortTask<'cfg, ('a -> 'b)>) (portTask: PortTask<'cfg, 'a>) : PortTask<_,_> =
         fun env ->
             task {
-                let! a = run env m
+                let! a = run env portTask
                 let! f = run env mf
                 return f a
             }
@@ -70,18 +78,18 @@ module PortTask =
     // Port
     // ===============
 
-    let fromPort (expr: Port<_,_>) : PortTask<_,_> =
-        fun env -> task { return Port.run env expr }
+    let fromPort (port: Port<_,_>) : PortTask<_,_> =
+        fun env -> task { return Port.run env port }
         |> Port
 
     let fromPortF (f: 'a -> Port<_,_>) : PortTask<_,_> =
         fun _ -> task { return f }
         |> Port
 
-    let applyPort (m: PortTask<'cfg, 'a>) (mf: PortTask<'cfg, ('a -> Port<'cfg, 'b>)>) : PortTask<_,_> =
+    let applyPort (portTask: PortTask<'cfg, 'a>) (mf: PortTask<'cfg, ('a -> Port<'cfg, 'b>)>) : PortTask<_,_> =
         fun env ->
             task {
-                let! a = run env m
+                let! a = run env portTask
                 let! f = run env mf
                 let p = f a
                 return Port.run env p
@@ -104,11 +112,11 @@ module PortTask =
         fun _ -> task { return f }
         |> Port
 
-    let applyTask (m: PortTask<'cfg, 'a>) (mf: PortTask<'cfg, ('a -> Task<'b>)>) : PortTask<_,_> =
+    let applyTask (portTask: PortTask<'cfg, 'a>) (portTaskf: PortTask<'cfg, ('a -> Task<'b>)>) : PortTask<_,_> =
         fun env ->
             task {
-                let! a = run env m
-                let! f = run env mf 
+                let! a = run env portTask
+                let! f = run env portTaskf 
                 return! f a
             }
         |> Port
@@ -129,11 +137,11 @@ module PortTask =
         fun _ -> task { return f }
         |> Port
 
-    let applyValueTask (m: PortTask<'cfg, 'a>) (mf: PortTask<'cfg, ('a -> ValueTask<'b>)>) : PortTask<_,_> =
+    let applyValueTask (portTask: PortTask<'cfg, 'a>) (portTaskF: PortTask<'cfg, ('a -> ValueTask<'b>)>) : PortTask<_,_> =
         fun env ->
             task {
-                let! a = run env m
-                let! f = run env mf 
+                let! a = run env portTask
+                let! f = run env portTaskF 
                 return! f a
             }
         |> Port

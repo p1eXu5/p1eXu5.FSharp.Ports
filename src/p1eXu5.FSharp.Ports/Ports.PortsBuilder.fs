@@ -17,28 +17,28 @@ module Port =
     let ask = Port id
 
     /// Map a function over a Reader
-    let map f reader =
-        Port (fun env -> f (run env reader))
+    let map f port =
+        Port (fun env -> f (run env port))
 
     /// flatMap a function over a Reader
-    let bind f interpreter =
+    let bind f port =
         let newAction env =
-            let x = run env interpreter
+            let x = run env port
             run env (f x)
         Port newAction
 
     /// The sequential composition operator.
     /// This is boilerplate in terms of "result" and "bind".
-    let combine expr1 expr2 =
-        expr1 |> bind (fun () -> expr2)
+    let combine port1 port2 =
+        port1 |> bind (fun () -> port2)
 
     /// The delay operator.
     let delay<'env, 'a> (func: unit -> Port<'env, 'a>) = func
 
     let retn v = (fun _ -> v) |> Port
 
-    let withEnv f interpreter =
-        Port (fun env -> run (f env) interpreter)
+    let withEnv f port =
+        Port (fun env -> run (f env) port)
 
     let tryFinally compensation delayed =
         let action env =

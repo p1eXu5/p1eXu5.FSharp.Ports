@@ -13,7 +13,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "p1eXu5.FSharp.Ports.Tests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "p1eXu5.FSharp.Ports.Tests.Tasks", "test\p1eXu5.FSharp.Ports.Tests.Tasks\p1eXu5.FSharp.Ports.Tests.Tasks.csproj", "{32948C48-1123-4DBB-B740-B9B63B0DFBAF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0312FFF8-536D-4E77-9F06-0342D1841BF5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_root", "_root", "{0312FFF8-536D-4E77-9F06-0342D1841BF5}"
 	ProjectSection(SolutionItems) = preProject
 		pack.cmd = pack.cmd
 		pack.fsx = pack.fsx
@@ -22,7 +22,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "p1eXu5.FSharp.Ports.PortTaskResult", "src\p1eXu5.FSharp.Ports.PortTaskResult\p1eXu5.FSharp.Ports.PortTaskResult.fsproj", "{BF8ED0FE-039C-4C71-BD36-1CA4BB4AE084}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "p1eXu5.FSharp.Ports.PortTaskResult.Tests", "test\p1eXu5.FSharp.Ports.PortTaskResult.Tests\p1eXu5.FSharp.Ports.PortTaskResult.Tests.fsproj", "{31CEB446-E3EE-4312-A61D-B03612393653}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "p1eXu5.FSharp.Ports.PortTaskResult.Tests", "test\p1eXu5.FSharp.Ports.PortTaskResult.Tests\p1eXu5.FSharp.Ports.PortTaskResult.Tests.fsproj", "{31CEB446-E3EE-4312-A61D-B03612393653}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{756F8A67-C174-472C-BA27-FDE228C3E815}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "p1eXu5.FSharp.Ports.Examples", "examples\p1eXu5.FSharp.Ports.Examples\p1eXu5.FSharp.Ports.Examples.fsproj", "{3C12812B-6B39-4950-ACDF-6B3BF71ECFDA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +54,10 @@ Global
 		{31CEB446-E3EE-4312-A61D-B03612393653}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31CEB446-E3EE-4312-A61D-B03612393653}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31CEB446-E3EE-4312-A61D-B03612393653}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C12812B-6B39-4950-ACDF-6B3BF71ECFDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C12812B-6B39-4950-ACDF-6B3BF71ECFDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C12812B-6B39-4950-ACDF-6B3BF71ECFDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C12812B-6B39-4950-ACDF-6B3BF71ECFDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +68,7 @@ Global
 		{32948C48-1123-4DBB-B740-B9B63B0DFBAF} = {F0A811F6-F4F2-4BF9-9506-3FBAD480F0A7}
 		{BF8ED0FE-039C-4C71-BD36-1CA4BB4AE084} = {F8F0D8FE-5B77-469E-B02C-45D21837C9D4}
 		{31CEB446-E3EE-4312-A61D-B03612393653} = {F0A811F6-F4F2-4BF9-9506-3FBAD480F0A7}
+		{3C12812B-6B39-4950-ACDF-6B3BF71ECFDA} = {756F8A67-C174-472C-BA27-FDE228C3E815}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3DD658CB-0F3A-4DBE-B8BB-71353098257E}

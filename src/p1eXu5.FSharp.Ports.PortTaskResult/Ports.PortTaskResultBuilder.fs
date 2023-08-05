@@ -7,31 +7,31 @@ open p1eXu5.FSharp.Ports.PortTaskBuilderCE
 type PortTaskResult<'env, 'Ok, 'Error> = Port<'env, Task<Result<'Ok, 'Error>>>
 
 module PortTaskResult =
-    let run env (m: PortTaskResult<_,_,_>) = PortTask.run env m
+    let run env (portTaskResult: PortTaskResult<_,_,_>) = PortTask.run env portTaskResult
 
-    let runSynchronously env (m: PortTaskResult<_,_,_>) = PortTask.runSynchronously env m
+    let runSynchronously env (portTaskResult: PortTaskResult<_,_,_>) = PortTask.runSynchronously env portTaskResult
 
     let retn v : PortTaskResult<_,_,_> = (fun _ -> taskResult { return v }) |> Port
 
     /// Create a TaskPort which returns the environment itself
     let ask : PortTaskResult<_,_,_> = Port (fun env -> taskResult { return env })
 
-    let map f taskResultPort : PortTaskResult<'env, 'Ok, 'Error> =
-        Port (fun env -> taskResult { return! TaskResult.map f (PortTask.run env taskResultPort) })
+    let map f (portTaskResult: PortTaskResult<_,'OkA,_>) : PortTaskResult<'env, 'OkB, 'Error> =
+        Port (fun env -> taskResult { return! TaskResult.map f (PortTask.run env portTaskResult) })
 
     /// flatMap a function over a TaskPort
-    let bind (f: 'a -> PortTaskResult<'env,_,_>) (m: PortTaskResult<'env,'a,_>) : PortTaskResult<'env,_,_> =
+    let bind (f: 'a -> PortTaskResult<'env,_,_>) (portTaskResult: PortTaskResult<'env,'a,_>) : PortTaskResult<'env,_,_> =
         fun env ->
             taskResult {
-                let! x = run env m
+                let! x = run env portTaskResult
                 return! (run env (f x))
             }
         |> Port
 
-    let withEnv f (m: PortTaskResult<_,_,_>) : PortTaskResult<_,_,_> =
+    let withEnv f (portTaskResult: PortTaskResult<_,_,_>) : PortTaskResult<_,_,_> =
         Port (fun env ->
             taskResult {
-                return! run (f env) m
+                return! run (f env) portTaskResult
             }
         )
 
@@ -39,26 +39,26 @@ module PortTaskResult =
     // Port
     // ===============
 
-    let fromPort (expr: Port<_,_>) : PortTaskResult<_,_,_> =
-        fun env -> taskResult { return Port.run env expr }
+    let fromPort (port: Port<_,_>) : PortTaskResult<_,_,_> =
+        fun env -> taskResult { return Port.run env port }
         |> Port
 
-    let fromPortTask (expr: PortTask<_,_>) : PortTaskResult<_,_,_> =
+    let fromPortTask (portTask: PortTask<_,_>) : PortTaskResult<_,_,_> =
         fun env ->
             task {
-                let! res = PortTask.run env expr
+                let! res = PortTask.run env portTask
                 return res |> Ok
             }
         |> Port
 
-    let fromPortF (f: 'a -> Port<_,_>) : PortTaskResult<_,_,_> =
+    let fromPortF (f: 'a -> Port<'envA,'b>) : PortTaskResult<'envB,_,'Error> =
         fun _ -> taskResult { return f }
         |> Port
 
-    let applyPort (m: PortTaskResult<_,_,_>) (mf: PortTaskResult<_, ('ok -> Port<_, 'b>), _>) : PortTaskResult<_,_,_> =
+    let applyPort (portTaskResult: PortTaskResult<_,_,_>) (mf: PortTaskResult<_, ('Ok -> Port<_, 'b>), _>) : PortTaskResult<_,_,_> =
         fun env ->
             taskResult {
-                let! a = run env m
+                let! a = run env portTaskResult
                 let! f = run env mf
                 let p = f a
                 return Port.run env p
@@ -68,27 +68,27 @@ module PortTaskResult =
     let fromResult (res: Result<_,_>) : PortTaskResult<_,_,_> =
         Port (fun _ -> taskResult { return! res })
 
-    let fromTaskResult (expr: Task<Result<_,_>>) : PortTaskResult<_,_,_> =
-        Port (fun _ -> taskResult { return! expr })
+    let fromTaskResult (taskRes: Task<Result<_,_>>) : PortTaskResult<_,_,_> =
+        Port (fun _ -> taskResult { return! taskRes })
 
-    let fromTaskT (expr: Task<_>) : PortTaskResult<_,_,_> =
+    let fromTaskT (t: Task<_>) : PortTaskResult<_,_,_> =
         Port (fun _ ->
             task {
-                let! v = expr
+                let! v = t
                 return Ok v
             }
         )
 
-    let fromTask (expr: Task) : PortTaskResult<_,_,_> =
+    let fromTask (t: Task) : PortTaskResult<_,_,_> =
         Port (fun _ ->
             task {
-                let! v = expr
+                let! v = t
                 return Ok v
             }
         )
 
-    let fromValueTaskResult (expr: ValueTask<Result<_,_>>) : PortTaskResult<_,_,_> =
-        Port (fun _ -> taskResult { return! expr })
+    let fromValueTaskResult (vtRes: ValueTask<Result<_,_>>) : PortTaskResult<_,_,_> =
+        Port (fun _ -> taskResult { return! vtRes })
 
     let fromValueTaskT (valueTask: ValueTask<_>) : PortTaskResult<_,_,_> =
         Port (fun _ ->
@@ -98,10 +98,10 @@ module PortTaskResult =
             }
         )
 
-    let fromValueTask (expr: ValueTask) : PortTaskResult<_,_,_> =
+    let fromValueTask (valueTask: ValueTask) : PortTaskResult<_,_,_> =
         Port (fun _ ->
             task {
-                let! v = expr
+                let! v = valueTask
                 return Ok v
             }
         )
