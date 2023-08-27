@@ -19,6 +19,15 @@ module PortTaskResult =
     let map f (portTaskResult: PortTaskResult<_,'OkA,_>) : PortTaskResult<'env, 'OkB, 'Error> =
         Port (fun env -> taskResult { return! TaskResult.map f (PortTask.run env portTaskResult) })
 
+    let mapError f (portTaskResult: PortTaskResult<_,'Ok, 'ErrorInput>) : PortTaskResult<'env, 'Ok, 'ErrorOutput> =
+        Port (fun env ->
+            task {
+                let! result = portTaskResult |> run env
+                return
+                    result |> Result.mapError f
+            }
+        )
+
     /// flatMap a function over a TaskPort
     let bind (f: 'a -> PortTaskResult<'env,_,_>) (portTaskResult: PortTaskResult<'env,'a,_>) : PortTaskResult<'env,_,_> =
         fun env ->
