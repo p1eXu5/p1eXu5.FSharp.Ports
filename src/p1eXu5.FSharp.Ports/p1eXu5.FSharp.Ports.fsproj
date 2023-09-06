@@ -18,7 +18,12 @@
 
   <ItemGroup>
     <Compile Include="Ports.PortsBuilder.fs" />
+    <Compile Include="Ports.PortResultBuilder.fs" />
     <Compile Include="Ports.PortTaskBuilder.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="4.9.0" />
   </ItemGroup>
 
   <ItemGroup>
