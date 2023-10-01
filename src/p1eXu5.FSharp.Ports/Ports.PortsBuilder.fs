@@ -8,7 +8,6 @@ module Port =
 
     open System
 
-
     /// Run a Interpreter with a given environment
     let run env (Port action)  =
         action env  // simply call the inner function
