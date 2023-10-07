@@ -78,11 +78,15 @@ module PortTask =
     // Port
     // ===============
 
-    let fromPort (port: Port<_,_>) : PortTask<_,_> =
+    let fromPort (port: Port<'env,_>) : PortTask<'env,_> =
         fun env -> task { return Port.run env port }
         |> Port
 
-    let fromPortF (f: 'a -> Port<_,_>) : PortTask<_,_> =
+    // let fromPortResult (port: PortResult<'env, 'ok, 'err>) : PortTask<'env, Result<'ok, 'err>> =
+    //     fun env -> task { return PortResult.run env port }
+    //     |> Port
+
+    let fromPortF (f: 'a -> Port<'env,_>) : PortTask<'env,_> =
         fun _ -> task { return f }
         |> Port
 

@@ -13,6 +13,7 @@ open p1eXu5.FSharp.Ports.Tests.Tasks
 open p1eXu5.FSharp.Ports
 open p1eXu5.FSharp.Ports.PortTaskResult
 open p1eXu5.FSharp.Ports.PortTaskResultBuilderCE
+open p1eXu5.FSharp.Ports.PortResultBuilderCE
 
 module PortTaskResultTests =
     [<Test>]
@@ -27,7 +28,7 @@ module PortTaskResultTests =
         res |> Result.shouldEqual 3
 
     [<Test>]
-    let ``Bind with succeeded taskResult test``() =
+    let ``Bind with succeeded taskResult: success``() =
         let success1 () = taskResult { return! Ok 1 }
 
         let sut = portTaskResult {
@@ -39,7 +40,7 @@ module PortTaskResultTests =
         res |> Result.shouldEqual 3
 
     [<Test>]
-    let ``Bind with succeeded taskResult and task returning result test``() =
+    let ``Bind with succeeded two taskResult: success``() =
         let success1 () = taskResult { return! Ok 1 }
         let success2 () = task { return Ok 2 }
 
@@ -54,7 +55,7 @@ module PortTaskResultTests =
         res |> Result.shouldEqual 3
 
     [<Test>]
-    let ``Bind with succeeded taskResult and task returning value test``() =
+    let ``Bind with succeeded taskResult and task: success``() =
         let success1 () = taskResult { return! Ok 1 }
         let success2 () = task { return 2 }
 
@@ -69,7 +70,7 @@ module PortTaskResultTests =
         res |> Result.shouldEqual 3
 
     [<Test>]
-    let ``Bind with succeeded taskResult and cs task returning value test``() =
+    let ``Bind with succeeded taskResult and Task{T}: success``() =
         let success1 () = taskResult { return! Ok 1 }
 
         let sut =
@@ -83,12 +84,26 @@ module PortTaskResultTests =
         res |> Result.shouldEqual 4
 
     [<Test>]
-    let ``Bind with succeeded taskResult and cs value task returning value test``() =
+    let ``Bind with succeeded taskResult and ValueTask{T}: success``() =
         let success1 () = taskResult { return! Ok 1 }
 
         let sut =
             portTaskResult {
                 let! a = success1 ()
+                let! b = TestValueTaskFactory.SimpleValueTaskWithReturn(3) |> PortTaskResult.fromValueTaskT
+                return a + b
+            }
+
+        let res = sut |> PortTaskResult.runSynchronously ()
+        res |> Result.shouldEqual 4
+
+    [<Test>]
+    let ``Bind with succeeded portResult and ValueTask{T}: success``() =
+        let success () = portResult { return! Ok 1 }
+
+        let sut =
+            portTaskResult {
+                let! a = success () |> PortTaskResult.fromPortResult
                 let! b = TestValueTaskFactory.SimpleValueTaskWithReturn(3) |> PortTaskResult.fromValueTaskT
                 return a + b
             }

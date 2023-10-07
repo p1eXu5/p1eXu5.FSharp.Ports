@@ -5,13 +5,50 @@ open System.Threading.Tasks
 
 open NUnit.Framework
 open FsUnit
+open p1eXu5.FSharp.Testing.ShouldExtensions
 
 open p1eXu5.FSharp.Ports
 open p1eXu5.FSharp.Ports.PortTaskBuilderCE
 
 open p1eXu5.FSharp.Ports.Tests.Tasks
+open p1eXu5.FSharp.Ports.PortResultBuilderCE
 
 module PortTaskTests =
+
+    [<Test>]
+    let ``Bind with succeeded Task{T}: success`` () =
+        let tp =
+            portTask {
+                let! _ = TestTaskFactory.SimpleTaskWithReturn(5)
+                return 5
+            }
+
+        let res = tp |> PortTask.runSynchronously ()
+        res |> should equal 5
+
+    [<Test>]
+    let ``Bind with succeeded ValueTask{T}: success`` () =
+        let tp =
+            portTask {
+                let! _ = TestValueTaskFactory.SimpleValueTaskWithReturn(5)
+                return 5
+            }
+
+        let res = tp |> PortTask.runSynchronously ()
+        res |> should equal 5
+
+    [<Test>]
+    let ``Bind with succeeded portResult: success`` () =
+        let success () = portResult { return! Ok 7 }
+        let tp =
+            portTask {
+                let! v = success () |> PortTask.fromPort
+                return v
+            }
+
+        let res = tp |> PortTask.runSynchronously ()
+        res |> Result.shouldEqual 7
+
 
     [<Test>]
     let ``ask return test``() =
@@ -49,29 +86,6 @@ module PortTaskTests =
         let tp = portTask { return! TestValueTaskFactory.SimpleValueTaskWithReturn(5) }
         let res = tp |> PortTask.runSynchronously ()
         res |> should equal 5
-
-    [<Test>]
-    let ``binding discarding cs task test`` () =
-        let tp =
-            portTask {
-                let! _ = TestTaskFactory.SimpleTaskWithReturn(5)
-                return 5
-            }
-
-        let res = tp |> PortTask.runSynchronously ()
-        res |> should equal 5
-
-    [<Test>]
-    let ``binding discarding cs value task test`` () =
-        let tp =
-            portTask {
-                let! _ = TestValueTaskFactory.SimpleValueTaskWithReturn(5)
-                return 5
-            }
-
-        let res = tp |> PortTask.runSynchronously ()
-        res |> should equal 5
-
     [<Test>]
     let ``try with discarding cs exception task test`` () =
         let tp =

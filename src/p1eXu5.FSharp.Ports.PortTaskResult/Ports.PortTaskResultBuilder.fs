@@ -3,6 +3,7 @@
 open System.Threading.Tasks
 open FsToolkit.ErrorHandling
 open p1eXu5.FSharp.Ports.PortTaskBuilderCE
+open PortResultBuilderCE
 
 type PortTaskResult<'env, 'Ok, 'Error> = Port<'env, Task<Result<'Ok, 'Error>>>
 
@@ -50,6 +51,10 @@ module PortTaskResult =
 
     let fromPort (port: Port<_,_>) : PortTaskResult<_,_,_> =
         fun env -> taskResult { return Port.run env port }
+        |> Port
+
+    let fromPortResult (port: PortResult<'env, 'ok, 'err>) : PortTaskResult<'env, 'ok, 'err> =
+        fun env -> taskResult { return! PortResult.run env port }
         |> Port
 
     let fromPortTask (portTask: PortTask<_,_>) : PortTaskResult<_,_,_> =
