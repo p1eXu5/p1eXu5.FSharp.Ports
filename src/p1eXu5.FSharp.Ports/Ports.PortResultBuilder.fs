@@ -25,6 +25,14 @@ module PortResult =
             }
         |> Port
 
+    let mapError f (portResult: PortResult<_,_,_>) =
+        fun env ->
+            result {
+                let res = portResult |> run env
+                return! res |> Result.mapError f
+            }
+        |> Port
+
     /// flatMap a function over a Reader
     let bind (f: 'a -> PortResult<_,'b,_>) (portResult: PortResult<_,'a,_>) =
         fun env ->

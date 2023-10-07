@@ -5,8 +5,8 @@ p1eXu5.FSharp.Ports & p1eXu5.FSharp.Ports.PortTaskResult
 
 | Package                            | Versions                                                                                                                                                   |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| p1eXu5.FSharp.Ports                | [![NuGet](https://img.shields.io/badge/nuget-1.0.8--preview-yellowgreen)](https://www.nuget.org/packages/p1eXu5.FSharp.Ports/1.0.8-preview)                |
-| p1eXu5.FSharp.Ports.PortTaskResult | [![NuGet](https://img.shields.io/badge/nuget-1.0.8--preview-yellowgreen)](https://www.nuget.org/packages/p1eXu5.FSharp.Ports.PortTaskResult/1.0.8-preview) |
+| p1eXu5.FSharp.Ports                | [![NuGet](https://img.shields.io/badge/nuget-1.0.10--preview-yellowgreen)](https://www.nuget.org/packages/p1eXu5.FSharp.Ports/1.0.10-preview)                |
+| p1eXu5.FSharp.Ports.PortTaskResult | [![NuGet](https://img.shields.io/badge/nuget-1.0.10--preview-yellowgreen)](https://www.nuget.org/packages/p1eXu5.FSharp.Ports.PortTaskResult/1.0.10-preview) |
 
 Computation expressions implementing Reader (also called the Environment monad) monade.
 
@@ -101,6 +101,34 @@ let foo =
 | withEnv f port    | ('a -> 'b) -> Port<'b,'c> -> Port<'a,'c> |
 
 
+### PortResult
+
+```fs
+type PortResult<'env, 'Ok, 'Error> = Port<'env, Result<'Ok, 'Error>>
+
+// CE
+open p1eXu5.FSharp.Ports.PortBuilderCE
+
+let foo =
+    portResult {
+        ...
+    }
+```
+
+#### PortResult module:
+
+| Function or value | Signature |
+| ----------------- | --------- |
+| run env port      | |
+| ask               | |
+| map f port        | |
+| mapError f port   | |
+| bind f port       | |
+| retn v            | |
+| withEnv f port    | ('a -> 'b) -> Port<'b,'c> -> Port<'a,'c> |
+| fromResult res    | |
+
+
 ### PortTask
 
 ```fs
@@ -163,6 +191,7 @@ let foo =
 | bind f portTaskResult | |
 | withEnv f portTaskResult | |
 | fromPort port | |
+| fromPortResult port | |
 | fromPortTask portTask | |
 | fromPortF f | ('a -> Port<'envA,'b>) -> PortTaskResult<'envB,('a -> Port<'envA,'b>),'Error> |
 | applyPort portTaskResult mf | |
