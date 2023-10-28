@@ -11,6 +11,12 @@ module PortTask =
     /// Run a TaskPort with a given environment
     let run env (portTask: PortTask<_,_>) = Port.run env portTask
 
+    let runf env (port: 'a -> PortTask<_,_>) = port >> run env
+
+    let runf2 env (port: 'a -> 'b -> PortTask<_,_>) = fun a b -> port a b |> run env
+
+    let runf3 env (port: 'a -> 'b -> 'c -> PortTask<_,_>) = fun a b c -> port a b c |> run env
+
     let runSynchronously env (portTask: PortTask<'env, 'a>)  =
         let (Port action) = portTask
         action env

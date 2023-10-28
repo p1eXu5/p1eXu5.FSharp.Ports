@@ -8,30 +8,28 @@ module Port =
 
     open System
 
-    /// Run a Interpreter with a given environment
-    let run env (Port action)  =
-        action env  // simply call the inner function
+    let run env (Port action) = action env
 
-    /// Create a Interpreter which returns the environment itself
+    let runf env (port: 'a -> Port<_,_>) = port >> run env
+
+    let runf2 env (port: 'a -> 'b -> Port<_,_>) = fun a b -> port a b |> run env
+
+    let runf3 env (port: 'a -> 'b -> 'c -> Port<_,_>) = fun a b c -> port a b c |> run env
+
     let ask = Port id
 
-    /// Map a function over a Reader
     let map f port =
         Port (fun env -> f (run env port))
 
-    /// flatMap a function over a Reader
     let bind f port =
         let newAction env =
             let x = run env port
             run env (f x)
         Port newAction
 
-    /// The sequential composition operator.
-    /// This is boilerplate in terms of "result" and "bind".
     let combine port1 port2 =
         port1 |> bind (fun () -> port2)
 
-    /// The delay operator.
     let delay<'env, 'a> (func: unit -> Port<'env, 'a>) = func
 
     let retn v = (fun _ -> v) |> Port

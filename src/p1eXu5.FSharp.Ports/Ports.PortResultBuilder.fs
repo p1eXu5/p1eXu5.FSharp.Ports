@@ -1,7 +1,6 @@
 ﻿namespace p1eXu5.FSharp.Ports
 
 open FsToolkit.ErrorHandling
-open p1eXu5.FSharp.Ports.PortBuilderCE
 
 type PortResult<'env, 'Ok, 'Error> = Port<'env, Result<'Ok, 'Error>>
 
@@ -9,14 +8,16 @@ module PortResult =
 
     open System
 
-    /// Run a Interpreter with a given environment
-    let run env (portResult: PortResult<_,_,_>) =
-        Port.run env portResult  // simply call the inner function
+    let run env (portResult: PortResult<_,_,_>) = Port.run env portResult
 
-    /// Create a Interpreter which returns the environment itself
+    let runf env (port: 'a -> PortResult<_,_,_>) = port >> run env
+
+    let runf2 env (port: 'a -> 'b -> PortResult<_,_,_>) = fun a b -> port a b |> run env
+
+    let runf3 env (port: 'a -> 'b -> 'c -> PortResult<_,_,_>) = fun a b c -> port a b c |> run env
+
     let ask : PortResult<_,_,_> = Port (fun env -> result { return env })
 
-    /// Map a function over a Reader
     let map f (portResult: PortResult<_,_,_>) =
         fun env ->
             result {
@@ -33,7 +34,6 @@ module PortResult =
             }
         |> Port
 
-    /// flatMap a function over a Reader
     let bind (f: 'a -> PortResult<_,'b,_>) (portResult: PortResult<_,'a,_>) =
         fun env ->
             result {
@@ -42,12 +42,9 @@ module PortResult =
             }
         |> Port
 
-    /// The sequential composition operator.
-    /// This is boilerplate in terms of "result" and "bind".
     let combine port1 port2 =
         port1 |> bind (fun () -> port2)
 
-    /// The delay operator.
     let delay<'env, 'a, 'err> (func: unit -> PortResult<'env, 'a, 'err>) = func
 
     let retn v : PortResult<_,_,_> = (fun _ -> v |> Ok) |> Port

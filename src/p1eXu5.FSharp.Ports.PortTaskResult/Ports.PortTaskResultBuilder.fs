@@ -10,6 +10,12 @@ type PortTaskResult<'env, 'Ok, 'Error> = Port<'env, Task<Result<'Ok, 'Error>>>
 module PortTaskResult =
     let run env (portTaskResult: PortTaskResult<_,_,_>) = PortTask.run env portTaskResult
 
+    let runf env (port: 'a -> PortTaskResult<_,_,_>) = port >> run env
+
+    let runf2 env (port: 'a -> 'b -> PortTaskResult<_,_,_>) = fun a b -> port a b |> run env
+
+    let runf3 env (port: 'a -> 'b -> 'c -> PortTaskResult<_,_,_>) = fun a b c -> port a b c |> run env
+
     let runSynchronously env (portTaskResult: PortTaskResult<_,_,_>) = PortTask.runSynchronously env portTaskResult
 
     let retn v : PortTaskResult<_,_,_> = (fun _ -> taskResult { return v }) |> Port
@@ -119,6 +125,7 @@ module PortTaskResult =
                 return Ok v
             }
         )
+
 
 open System
 
