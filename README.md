@@ -5,8 +5,8 @@ p1eXu5.FSharp.Ports & p1eXu5.FSharp.Ports.PortTaskResult
 
 | Package                            | Versions                                                                                                                                                   |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| p1eXu5.FSharp.Ports                | [![NuGet](https://img.shields.io/badge/nuget-1.0.10--preview-yellowgreen)](https://www.nuget.org/packages/p1eXu5.FSharp.Ports/1.0.10-preview)                |
-| p1eXu5.FSharp.Ports.PortTaskResult | [![NuGet](https://img.shields.io/badge/nuget-1.0.10--preview-yellowgreen)](https://www.nuget.org/packages/p1eXu5.FSharp.Ports.PortTaskResult/1.0.10-preview) |
+| p1eXu5.FSharp.Ports                | [![NuGet](https://img.shields.io/badge/nuget-1.0.11--preview-yellowgreen)](https://www.nuget.org/packages/p1eXu5.FSharp.Ports/1.0.11-preview)                |
+| p1eXu5.FSharp.Ports.PortTaskResult | [![NuGet](https://img.shields.io/badge/nuget-1.0.11--preview-yellowgreen)](https://www.nuget.org/packages/p1eXu5.FSharp.Ports.PortTaskResult/1.0.11-preview) |
 
 Computation expressions implementing Reader (also called the Environment monad) monade.
 
