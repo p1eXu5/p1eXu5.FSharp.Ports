@@ -16,7 +16,7 @@ open p1eXu5.FSharp.Ports.PortResultBuilderCE
 module PortTaskTests =
 
     [<Test>]
-    let ``Bind with succeeded Task{T}: success`` () =
+    let ``Bind with succeeded Task{T}`` () =
         let tp =
             portTask {
                 let! _ = TestTaskFactory.SimpleTaskWithReturn(5)
@@ -27,7 +27,7 @@ module PortTaskTests =
         res |> should equal 5
 
     [<Test>]
-    let ``Bind with succeeded ValueTask{T}: success`` () =
+    let ``Bind with succeeded ValueTask{T}`` () =
         let tp =
             portTask {
                 let! _ = TestValueTaskFactory.SimpleValueTaskWithReturn(5)
@@ -38,7 +38,7 @@ module PortTaskTests =
         res |> should equal 5
 
     [<Test>]
-    let ``Bind with succeeded portResult: success`` () =
+    let ``Bind with succeeded portResult`` () =
         let success () = portResult { return! Ok 7 }
         let tp =
             portTask {
@@ -51,7 +51,7 @@ module PortTaskTests =
 
 
     [<Test>]
-    let ``ask return test``() =
+    let ``PortTask ask returns env``() =
         let sut =
             portTask {
                 let! env = PortTask.ask
@@ -62,32 +62,32 @@ module PortTaskTests =
         res |> should equal 3
 
     [<Test>]
-    let ``return from task test`` () =
+    let ``Return from task`` () =
         let task = task { return 5 }
         let tp = portTask { return! task }
         let res = tp |> PortTask.runSynchronously ()
         res |> should equal 5
 
     [<Test>]
-    let ``return from value task test`` () =
+    let ``Return from value task`` () =
         let valueTask = ValueTask.FromResult(5)
         let tp = portTask { return! valueTask }
         let res = tp |> PortTask.runSynchronously ()
         res |> should equal 5
 
     [<Test>]
-    let ``return from cs task test`` () =
+    let ``Return from cs task`` () =
         let tp = portTask { return! TestTaskFactory.SimpleTaskWithReturn(5) }
         let res = tp |> PortTask.runSynchronously ()
         res |> should equal 5
 
     [<Test>]
-    let ``return from cs value task test`` () =
+    let ``Return from cs value task`` () =
         let tp = portTask { return! TestValueTaskFactory.SimpleValueTaskWithReturn(5) }
         let res = tp |> PortTask.runSynchronously ()
         res |> should equal 5
     [<Test>]
-    let ``try with discarding cs exception task test`` () =
+    let ``Try binding with discarding cs exception task test`` () =
         let tp =
             portTask {
                 try
@@ -102,7 +102,7 @@ module PortTaskTests =
         res |> should equal 6
 
     [<Test>]
-    let ``try with discarding cs value task test`` () =
+    let ``Try binding with discarding cs value task`` () =
         let tp =
             portTask {
                 try
@@ -117,7 +117,7 @@ module PortTaskTests =
 
 
     [<Test>]
-    let ``use cs disposable task test`` () =
+    let ``Use binding with cs disposable task`` () =
         let tp =
             portTask {
                 use! d = TestTaskFactory.CreateSyncDisposableAsync()
@@ -130,7 +130,7 @@ module PortTaskTests =
 
 
     [<Test>]
-    let ``use cs async disposable task test`` () =
+    let ``Use binding with cs async disposable task`` () =
         let tp =
             portTask {
                 use! d = TestTaskFactory.CreateAsynchronousDisposableAsync()
@@ -143,7 +143,7 @@ module PortTaskTests =
 
 
     [<Test>]
-    let ``for cs task test`` () =
+    let ``For binding with cs task test`` () =
         let tp =
             portTask {
                 for _ in 1..3 do

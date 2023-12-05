@@ -72,14 +72,21 @@ module PortResult =
     let fromResult (res: Result<_,_>) : PortResult<_,_,_> =
         Port (fun _ -> result { return! res })
 
+    let fromPort (port: Port<_,_>) : PortResult<_,_,_> =
+        fun env -> result { return Port.run env port }
+        |> Port
+
 module PortResultBuilderCE =
 
     type PortResultBuilder () =
         member _.Return(v) = PortResult.retn v
         member _.ReturnFrom(expr: PortResult<_,_,_>) = expr
         member _.ReturnFrom(expr: Result<_,_>) = expr |> PortResult.fromResult
+
         member _.Bind(m: PortResult<_,'a,_>, f: 'a -> PortResult<_,'b,_>) = PortResult.bind f m
         member this.Bind(m: Result<'a,_>, f: 'a -> PortResult<_,'b,_>) = this.Bind(m |> PortResult.fromResult, f)
+        member this.Bind(m: Port<_,'a>, f: 'a -> PortResult<_,'b,_>) = this.Bind(m |> PortResult.fromPort, f)
+
         member _.Zero() = Port (fun _ -> Ok ())
         member _.Combine(expr1, expr2) = PortResult.combine expr1 expr2
         member _.Delay(func) = func
