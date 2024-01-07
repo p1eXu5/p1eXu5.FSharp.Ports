@@ -4,9 +4,9 @@
     <TargetFrameworks>netstandard2.1;net6.0;net7.0;net8.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     
-    <Version>1.0.13</Version>
+    <Version>1.0.14</Version>
     <AssemblyVersion>1.0</AssemblyVersion>
-    <FileVersion>1.0.13.0</FileVersion>
+    <FileVersion>1.0.14.0</FileVersion>
     <Authors>p1eXu5</Authors>
     <Description>Port and PortTask computation expressions.</Description>
     <Copyright>2023 Vladimir Likhatskiy</Copyright>
@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FsToolkit.ErrorHandling" Version="4.12.0" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="4.14.0" />
   </ItemGroup>
 
   <ItemGroup>
