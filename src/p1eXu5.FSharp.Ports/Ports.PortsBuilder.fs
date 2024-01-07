@@ -65,6 +65,15 @@ module PortBuilderCE =
                 this.While(guard, body))
 
         member _.TryFinally(body, compensation) = Port.tryFinally compensation body
+
+        member _.TryWith(delayed: unit -> Port<_,_>, handler: exn -> Port<_,_>) =
+            fun env ->
+                try
+                    delayed() |> Port.run env
+                with e ->
+                    handler e |> Port.run env
+            |> Port
+
         member _.Using(v, f) = Port.using f v
         member this.For(sequence: seq<_>, f) =
             this.Using(sequence.GetEnumerator(),fun enum ->

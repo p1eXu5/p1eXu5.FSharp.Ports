@@ -49,8 +49,11 @@ module PortTask =
     let bind portTaskf portTask : PortTask<_,_> =
         let newAction env =
             task {
-                let! x = run env portTask
-                return! run env (portTaskf x)
+                try
+                    let! x = run env portTask
+                    return! run env (portTaskf x)
+                with ex ->
+                    return raise ex
             }
         Port newAction
 
@@ -199,13 +202,15 @@ module PortTaskBuilderCE =
                 }
             )
 
-        member this.TryWith(delayed: unit -> PortTask<_,_>, handler: exn -> PortTask<_,_>) =
-            try
-                this.ReturnFrom(delayed())
-            with
-                e ->
-                    handler e
-
+        member _.TryWith(delayed: unit -> PortTask<_,_>, handler: exn -> PortTask<_,_>) =
+            fun env ->
+                task {
+                    try
+                        return! delayed() |> PortTask.run env
+                    with e ->
+                        return! handler e |> PortTask.run env
+                }
+            |> Port
 
         member _.TryFinally(delayed: unit -> PortTask<_,_>, compensation) =
             Port (fun env ->

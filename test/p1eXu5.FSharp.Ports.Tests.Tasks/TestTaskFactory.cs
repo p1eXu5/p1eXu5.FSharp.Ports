@@ -8,9 +8,15 @@ public static class TestTaskFactory
     public static Task<int> TaskFromException(int _)
         => Task.FromException<int>(new NotImplementedException());
 
+    /// <summary>
+    /// Throws <see cref="NotImplementedException"/>.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
     public static Task<int> SimpleTaskWithException(int value)
     {
-        throw new NotImplementedException();
+        throw new Exception("Test Exception");
     }
 
     public static Task DoTaskAsync()

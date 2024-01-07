@@ -164,12 +164,15 @@ module PortTaskResultBuilderCE =
                 }
             )
 
-        member this.TryWith(delayed: unit -> PortTaskResult<_,_,_>, handler: exn -> PortTaskResult<_,_,_>) =
-            try
-                this.ReturnFrom(delayed())
-            with
-                e ->
-                    handler e
+        member _.TryWith(delayed: unit -> PortTaskResult<_,_,_>, handler: exn -> PortTaskResult<_,_,_>) =
+            fun env ->
+                taskResult {
+                    try
+                        return! delayed() |> PortTaskResult.run env
+                    with e ->
+                        return! handler e |> PortTaskResult.run env
+                }
+            |> Port
 
         member _.TryFinally(delayed: unit -> PortTaskResult<_,_,_>, compensation) =
             Port (fun env ->

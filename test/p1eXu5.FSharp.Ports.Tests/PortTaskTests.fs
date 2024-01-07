@@ -51,7 +51,7 @@ module PortTaskTests =
 
 
     [<Test>]
-    let ``PortTask ask returns env``() =
+    let ``ask returns env``() =
         let sut =
             portTask {
                 let! env = PortTask.ask
@@ -86,13 +86,34 @@ module PortTaskTests =
         let tp = portTask { return! TestValueTaskFactory.SimpleValueTaskWithReturn(5) }
         let res = tp |> PortTask.runSynchronously ()
         res |> should equal 5
+
     [<Test>]
-    let ``Try binding with discarding cs exception task test`` () =
+    let ``Try binding with thowing cs task test`` () =
         let tp =
             portTask {
                 try
                     let! _ = TestTaskFactory.SimpleTaskWithException(5)
                     return 5
+                with
+                    ex ->
+                        return! portTask { return 6 }
+            }
+
+        let res = tp |> PortTask.runSynchronously ()
+        res |> should equal 6
+
+    [<Test>]
+    let ``Try binding with port task thowing cs task test`` () =
+        let innertp =
+            portTask {
+                let! _ = TestTaskFactory.SimpleTaskWithException(5)
+                return 5
+            }
+
+        let tp =
+            portTask {
+                try
+                    return! innertp
                 with
                     ex ->
                         return! portTask { return 6 }

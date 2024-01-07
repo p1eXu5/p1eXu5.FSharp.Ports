@@ -97,6 +97,16 @@ module PortResultBuilderCE =
             else this.Bind( body (), fun () ->
                 this.While(guard, body))
 
+        member _.TryWith(delayed: unit -> PortResult<_,_,_>, handler: exn -> PortResult<_,_,_>) =
+            fun env ->
+                result {
+                    try
+                        return! delayed() |> PortResult.run env
+                    with e ->
+                        return! handler e |> PortResult.run env
+                }
+            |> Port
+
         member _.TryFinally(body, compensation) = PortResult.tryFinally compensation body
         member _.Using(v, f) = PortResult.using f v
         member this.For(sequence: seq<_>, f) =
