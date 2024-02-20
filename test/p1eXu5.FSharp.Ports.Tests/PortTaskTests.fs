@@ -12,6 +12,7 @@ open p1eXu5.FSharp.Ports.PortTaskBuilderCE
 
 open p1eXu5.FSharp.Ports.Tests.Tasks
 open p1eXu5.FSharp.Ports.PortResultBuilderCE
+open FsUnitTyped.TopLevelOperators
 
 module PortTaskTests =
 
@@ -48,6 +49,22 @@ module PortTaskTests =
 
         let res = tp |> PortTask.runSynchronously ()
         res |> Result.shouldEqual 7
+
+    [<Test>]
+    let ``Bind with portTask of unit`` () =
+        let inner asd : PortTask<unit, unit> =
+            portTask {
+                return ()
+            }
+
+        let tp =
+            portTask {
+                do! inner "asd"
+                return 7
+            }
+
+        let res = tp |> PortTask.runSynchronously ()
+        res |> shouldEqual 7
 
 
     [<Test>]

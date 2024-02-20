@@ -4,9 +4,9 @@
     <TargetFrameworks>netstandard2.1;net6.0;net7.0;net8.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     
-    <Version>1.0.14</Version>
+    <Version>1.0.15</Version>
     <AssemblyVersion>1.0</AssemblyVersion>
-    <FileVersion>1.0.14.0</FileVersion>
+    <FileVersion>1.0.15.0</FileVersion>
     <Authors>p1eXu5</Authors>
     <Description>Port and PortTask computation expressions.</Description>
     <Copyright>2023 Vladimir Likhatskiy</Copyright>
@@ -17,9 +17,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Ports.PortsBuilder.fs" />
-    <Compile Include="Ports.PortResultBuilder.fs" />
-    <Compile Include="Ports.PortTaskBuilder.fs" />
+    <Compile Include="PortsBuilder.fs" />
+    <Compile Include="PortResultBuilder.fs" />
+    <Compile Include="PortTaskBuilder.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -75,13 +75,22 @@ module PortTaskResult =
         fun _ -> taskResult { return f }
         |> Port
 
-    let applyPort (portTaskResult: PortTaskResult<_,_,_>) (mf: PortTaskResult<_, ('Ok -> Port<_, 'b>), _>) : PortTaskResult<_,_,_> =
+    let applyPort (mf: PortTaskResult<'env,('a -> Port<'env,'b>),'err>) (ma: PortTaskResult<'env,'a,'err>) : PortTaskResult<'env,'b,'err> =
         fun env ->
             taskResult {
-                let! a = run env portTaskResult
+                let! a = run env ma
                 let! f = run env mf
                 let p = f a
                 return Port.run env p
+            }
+        |> Port
+
+    let apply (mf: PortTaskResult<'env,('a ->'b),'err>) (ma: PortTaskResult<'env,'a,'err>) : PortTaskResult<'env,'b,'err> =
+        fun env ->
+            taskResult {
+                let! a = run env ma
+                let! f = run env mf
+                return f a
             }
         |> Port
 
